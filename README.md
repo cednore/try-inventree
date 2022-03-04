@@ -1,6 +1,6 @@
 # try-inventree
 
-> Try Inventree's official docker-compose setup on your local
+> Try InvenTree's official docker-compose setup on your local
 
 ## Getting started
 
