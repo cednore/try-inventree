@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  inventree-db:
+    container_name: inventree-db
+    image: postgres:13
+    ports:
+      - 5432/tcp
+    env_file:
+      - .env
+    volumes:
+      - data:/var/lib/postgresql/data/
+    restart: unless-stopped
+
+  inventree-server:
+    container_name: inventree-server
+    image: inventree/inventree:stable
+    expose:
+      - 8000
+    depends_on:
+      - inventree-db
+    volumes:
+      - data:/home/inventree/data
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  inventree-worker:
+    container_name: inventree-worker
+    image: inventree/inventree:stable
+    command: invoke worker
+    depends_on:
+      - inventree-db
+      - inventree-server
+    volumes:
+      - data:/home/inventree/data
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  inventree-proxy:
+    container_name: inventree-proxy
+    image: nginx:stable
+    depends_on:
+      - inventree-server
+    ports:
+      - 1337:80
+    volumes:
+      - ./conf/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - data:/var/www
+    restart: unless-stopped
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes

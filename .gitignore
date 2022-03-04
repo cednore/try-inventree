@@ -1,0 +1,7 @@
+# Volumes for docker-compose
+/volumes
+
+# Dotenv files
+.env
+.env.*
+!.env.example
